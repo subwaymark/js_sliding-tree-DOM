@@ -1,27 +1,34 @@
+'use strict';
+
 const treeOnThePage = document.getElementsByClassName('tree')[0];
 
-const setSpanTag = function (data) {
-  const hasChild = data.children.length > 0;
-  const children = data.children;
+const setSpanTag = function (element) {
+  const isDOMObject = element instanceof Element;
+
+  if (!isDOMObject) {
+    return;
+  }
+
+  const hasChild = element.children.length > 0;
+  const children = element.children;
 
   if (!hasChild) {
     return null;
   } else {
     for (const child of children) {
       const toEdit = child;
-      const toNotInclude = toEdit.innerHTML.match(/(\b\w+\b *)+/)[0];
 
       if (child.tagName === 'LI' && child.children.length > 0) {
-        toEdit.innerHTML = toEdit.innerHTML.replace(
-          toNotInclude,
-          `<span>\n ${toNotInclude}\n </span>\n`,
-        );
+        const span = document.createElement('span');
+
+        span.innerHTML = `${toEdit.childNodes[0].nodeValue}`;
+        toEdit.replaceChild(span, toEdit.childNodes[0]);
       }
 
       setSpanTag(child);
     }
 
-    return data;
+    return element;
   }
 };
 
@@ -33,13 +40,15 @@ for (const header of pageHeaders) {
   header.onclick = function (e) {
     const target = e.target;
     const isChildrenHidden =
-      target.nextElementSibling.children[0].style.display === 'none';
+      target.nextElementSibling.children.length > 0
+        ? target.nextElementSibling.children[0].style.display === 'none'
+        : null;
 
     if (isChildrenHidden) {
       [...target.nextElementSibling.children].forEach((child) => {
         child.style.display = '';
       });
-    } else {
+    } else if (isChildrenHidden === false) {
       [...target.nextElementSibling.children].forEach((child) => {
         child.style.display = 'none';
       });
