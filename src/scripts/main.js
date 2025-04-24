@@ -39,8 +39,9 @@ const pageHeaders = [...document.querySelectorAll('.tree span')];
 for (const header of pageHeaders) {
   header.onclick = function (e) {
     const target = e.target;
+    const hasNextElementSibling = target.nextElementSibling !== undefined;
     const isChildrenHidden =
-      target.nextElementSibling.children.length > 0
+      hasNextElementSibling && target.nextElementSibling.children.length > 0
         ? target.nextElementSibling.children[0].style.display === 'none'
         : null;
 
